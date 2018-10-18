@@ -1,0 +1,37 @@
+---
+title: "Build Regression Trees"
+author: "Anna Qian"
+date: "10/18/2018"
+output: html_document
+---
+
+## SSE Function
+```{r}
+
+
+```
+
+
+## Split
+```{r}
+
+
+
+```
+
+
+## Find the node with minimum SSE
+```{r}
+
+
+```
+
+
+## Build Trees
+```{r}
+
+
+
+```
+
+
