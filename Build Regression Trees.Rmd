@@ -7,7 +7,15 @@ output: html_document
 
 ## SSE Function
 ```{r}
+# input:
+# P - a vector including weekly prices for the specific category in the particular store
+# c - a variable representing the price for the specific category
+# Y - a vector including weekly sales quantities for the specific category in the particular store
 
+get_sse <- function(P, c, Y)
+{
+  sse = sum(((P-c)*Y - (P-c)*mean(Y))^2)
+}
 
 ```
 
