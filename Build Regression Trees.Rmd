@@ -1,6 +1,6 @@
 ---
 title: "Build Regression Trees"
-author: "Anna Qian"
+author: "Alay Yang, Anna Qian"
 date: "10/18/2018"
 output: html_document
 ---
