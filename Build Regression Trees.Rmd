@@ -22,8 +22,27 @@ get_sse <- function(P, c, Y)
 
 ## Split
 ```{r}
+# input:
+# X - a vector including one of the marketing mix
+# Y - a vector including weekly sales quantities for the specific category in the particular store
+# node - index of the position where the data is splited
+# c - a variable representing the price for the specific category
+# output:
+# a new SSE for splited data
 
-
+get_split_sse<-function(X,Y,node,c)
+  {
+  pos<-which(X<=X[node]) #Decision rule
+  X1<-X[pos];  X2<-X[-pos] #Split X by set node
+  Y1<-Y[pos];  Y2<-Y[-pos]; #Split Y by set node
+  #SSE X1
+  sse1<-get_sse(X1,c,Y1)
+  #SSE X2
+  sse2<-get_sse(X2,c,Y2)
+  #Split SSE
+  s_sse<- sse1+sse2
+  return (s_sse)
+  }
 
 ```
 
