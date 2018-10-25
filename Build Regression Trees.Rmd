@@ -9,15 +9,16 @@ output: html_document
 ```{r}
 # input:
 # P - a vector including weekly prices for the specific category in the particular store
-# c - a variable representing the price for the specific category
 # Y - a vector including weekly sales quantities for the specific category in the particular store
-# output:
-# customized SSE for a given dataset 
+# c - a variable representing the price for the specific category
 
-get_sse <- function(P, c, Y)
+# output:
+# customized SSE
+
+get_sse <- function(P, Y, c)
 {
   sse = sum(((P-c)*Y - (P-c)*mean(Y))^2)
-  return(sse)
+  return (sse)
 }
 
 ```
@@ -28,25 +29,26 @@ get_sse <- function(P, c, Y)
 # input:
 # X - a vector including one of the marketing mix
 # Y - a vector including weekly sales quantities for the specific category in the particular store
-# node - index of the position where the data is splited
+# P - a vector including weekly prices for the specific category in the particular store
 # c - a variable representing the price for the specific category
+# node - index of the position where the data is splited
+
 # output:
 # a new SSE for splited data
 
-get_split_sse<-function(X,Y,node,c)
+get_split_sse<-function(X,Y,P,c,node)
   {
-  P <- X[gsub("Y", "P", names(Y))]
   pos<-which(X<=X[node]) #Decision rule
   Y1<-Y[pos];  Y2<-Y[-pos]; #Split Y by set node
   P1<-P[pos];  P2<-P[-pos]: #Split P by node
   #SSE X1
-  sse1<-get_sse(P1,c,Y1)
+  sse1<-get_sse(P1,Y1,c)
   #SSE X2
-  sse2<-get_sse(P2,c,Y2)
+  sse2<-get_sse(P2,Y2,c)
   #Split SSE
   s_sse<- sse1+sse2
   return (s_sse)
-  }
+}
 
 ```
 
