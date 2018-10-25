@@ -11,6 +11,8 @@ output: html_document
 # P - a vector including weekly prices for the specific category in the particular store
 # c - a variable representing the price for the specific category
 # Y - a vector including weekly sales quantities for the specific category in the particular store
+# output:
+# customized SSE for a given dataset 
 
 get_sse <- function(P, c, Y)
 {
