@@ -17,6 +17,7 @@ output: html_document
 get_sse <- function(P, c, Y)
 {
   sse = sum(((P-c)*Y - (P-c)*mean(Y))^2)
+  return(sse)
 }
 
 ```
@@ -51,7 +52,26 @@ get_split_sse<-function(X,Y,node,c)
 
 ## Find the node with minimum SSE
 ```{r}
+# input:
+# X - a vector including one of the marketing mix
+# Y - a vector including weekly sales quantities for the specific category in the particular store
+# c - a variable representing the price for the specific category
+# output:
+# the location (node) that would give the minimum SSE if we split the data there
 
+fnd_node <- function(X, Y, c)
+{
+  node = 1
+  min_sse = get_split_sse(X, Y, node, c)
+  for (i in 2:length(X)) {
+    sse = get_split_sse(X, Y, i, c)
+    if (sse < min_sse){
+      min_sse = sse
+      node = i
+    }
+  }
+  return(node)
+}
 
 ```
 
