@@ -81,7 +81,81 @@ fnd_node <- function(X, Y, c)
 
 ## Build Trees
 ```{r}
+# input:
+# X - a list of vectors including all the marketing mixes
+# Y - a vector including weekly sales quantities for the specific category in the particular store
+# n - minimum number of observations in each node
+# c - a variable representing the price for the specific category
+# output:
+# a list recording the split locations on each layer
 
+# find the minimum observations among all nodes
+fnd_min_obs <- function(lstX){
+    obs <- c()
+    for (i in 1:length(lstX)){
+      obs[i] <- length(unlist(lstX[[i]][1]))
+    }
+    min_obs <- min(obs)
+    return (min_obs)
+}
+
+crt_dtree<-function(lstX,lstY,n,c){
+    
+  while (fnd_min_obs(lstX)>5) {
+  
+    # calcaulte current total sse
+    cur_sse <- 0
+    for (i in 1:lengt(lstY)) {
+      tem_X <- lstX[[i]]
+      tem_Y <- lstY[[i]]
+      tem_P <- tem_X[gsub("Y","P",names(tem_Y))]
+      cur_sse <- cur_sse + get_sse(tem_P,tem_Y,c)
+    }
+  
+    # create variables to store splited data and new sse
+    new_lstX <- list()
+    new_lstY <- list()
+    new_sse <- 0
+  
+    # split each data in lstX
+    for (i in 1:length(lstX)){
+    X_toSplit <- lstX[[i]]
+    Y_toSplit <- lstY[[i]]
+    P_toSplit <- X_toSplit[gsub("Y","P",names(Y_toSplit))]
+    
+    # calculate current sse for X_toSplit
+    X_toSplit_sse <- get_sse(P_toSplit,Y_toSplit,c)
+    
+    # find node for X_toSplit
+    list(split_x, split_value, split_sse) <- fnd_node(X_toSplit,Y,c)
+    
+    # compare sse before and after split
+    if (split_sse < X_toSplit_sse) {
+      pos <- which(X_toSplit[split_x]<=split_value)
+      X1 <- X_toSplit[pos];  X2 <- X_toSplit[-pos]
+      Y1 <- Y[pos];  Y1 <- Y[-pos]
+      new_lstX <- append(new_lstX,X1)
+      new_lstX <- append(new_lstX,X2)
+      new_lstY <- append(new_lstY,Y1)
+      new_lstY <- append(new_lstY,Y2)
+      new_sse <- new_sse + split_sse
+     } else{
+      new_lstX <- append(new_lstX,X_toSplit)
+      new_lstY <- append(new_lstY,Y_toSplit)
+      new_sse <- new_sse + X_toSplit_sse
+     }
+    }
+    
+    # estimate whether to continue spliting
+    if (new_sse<cur_sse) {
+      lstX <- new_lstX
+      lstY <- new_lstY
+      cur_sse <- new_sse
+    } else{
+      break
+    }
+  }
+}
 
 
 ```
