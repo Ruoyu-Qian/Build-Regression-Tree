@@ -56,21 +56,27 @@ get_split_sse<-function(X,Y,P,c,node)
 ## Find the node with minimum SSE
 ```{r}
 # input:
-# X - a vector including one of the marketing mix
+# P - a vector including weekly prices for the specific category in the particular store
+# X - a list of vectors including all of the marketing mix
 # Y - a vector including weekly sales quantities for the specific category in the particular store
 # c - a variable representing the price for the specific category
 # output:
-# the location (node) that would give the minimum SSE if we split the data there
+# node - a vector like (index, value) indicating the node that would give the minimum SSE if we split the data there
 
-fnd_node <- function(X, Y, c)
+fnd_node <- function(P, X, Y, c)
 {
-  node = 1
-  min_sse = get_split_sse(X, Y, node, c)
-  for (i in 2:length(X)) {
-    sse = get_split_sse(X, Y, i, c)
-    if (sse < min_sse){
-      min_sse = sse
-      node = i
+  node = NaN
+  min_sse = get_sse(P, c, Y)
+  for (i in 1:length(X)) {
+    index = i
+    X_vector = X[[i]]
+    for (j in 1:length(X_vector)){
+      sse = get_split_sse(X_vector, Y, j, c)
+      if (sse < min_sse){
+        min_sse = sse
+        value = X_vector[j]
+        node = c(index, value)
+      }
     }
   }
   return(node)
