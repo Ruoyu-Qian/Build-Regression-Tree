@@ -170,3 +170,21 @@ crt_dtree<-function(lstX,lstY,n,c){
 ```
 
 
+## Prediction
+```{r}
+# input:
+# model - customized regression tree model
+# X - a vector including all of the marketing mix of the case to be predicted (a specific category in a particular store for a specific week)
+# output:
+# y - predicted sales quantity
+
+crt_prediction <- function(model, X) {
+  
+  
+}
+
+
+
+
+```
+
