@@ -133,7 +133,10 @@ crt_dtree<-function(lstX,lstY,n,c){
     X_toSplit_sse <- get_sse(P_toSplit,Y_toSplit,c)
     
     # find node for X_toSplit
-    list(split_x, split_value, split_sse) <- fnd_node(X_toSplit,Y,c)
+    split <- fnd_node(X_toSplit,Y,c)
+    split_x <- split[1]
+    split_value <- split[2]
+    split_sse <- split[3]
     
     # compare sse before and after split
     if (split_sse < X_toSplit_sse) {
