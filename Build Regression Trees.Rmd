@@ -61,7 +61,7 @@ get_split_sse<-function(X,Y,P,c,node)
 # Y - a vector including weekly sales quantities for the specific category in the particular store
 # c - a variable representing the price for the specific category
 # output:
-# node - a vector like (index, value) indicating the node that would give the minimum SSE if we split the data there
+# node - a vector like (index, value, sse) indicating the node that would give the minimum SSE if we split the data there
 
 fnd_node <- function(P, X, Y, c)
 {
@@ -75,7 +75,7 @@ fnd_node <- function(P, X, Y, c)
       if (sse < min_sse){
         min_sse = sse
         value = X_vector[j]
-        node = c(index, value)
+        node = c(index, value, min_sse)
       }
     }
   }
