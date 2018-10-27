@@ -71,7 +71,7 @@ fnd_node <- function(P, X, Y, c)
     index = i
     X_vector = X[[i]]
     for (j in 1:length(X_vector)){
-      sse = get_split_sse(X_vector, Y, j, c)
+      sse = get_split_sse(X_vector, Y, P, c, j)
       if (sse < min_sse){
         min_sse = sse
         value = X_vector[j]
