@@ -68,13 +68,14 @@ fnd_node <- function(P, X, Y, c)
   node = NaN
   min_sse = get_sse(P, c, Y)
   for (i in 1:length(X)) {
-    index = i
-    X_vector = X[[i]]
+    index = i # which variable
+    # sort X
+    X_vector = sort(X[[i]])
     for (j in 1:length(X_vector)){
       sse = get_split_sse(X_vector, Y, P, c, j)
       if (sse < min_sse){
         min_sse = sse
-        value = X_vector[j]
+        value = (X_vector[j]+X_vector[j+1])/2 # where to split
         node = c(index, value, min_sse)
       }
     }
