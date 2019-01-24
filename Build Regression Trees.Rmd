@@ -36,11 +36,11 @@ get_sse <- function(P, Y, c)
 # output:
 # a new SSE for splited data
 
-get_split_sse<-function(X,Y,P,c,node)
+get_split_sse<-function(X,Y,P,c,position)
   {
-  pos<-which(X<=X[node]) #Decision rule
+  pos<-which(X<=X[position]) #Decision rule
   Y1<-Y[pos];  Y2<-Y[-pos]; #Split Y by set node
-  P1<-P[pos];  P2<-P[-pos]: #Split P by node
+  P1<-P[pos];  P2<-P[-pos]; #Split P by node
   #SSE X1
   sse1<-get_sse(P1,Y1,c)
   #SSE X2
@@ -66,7 +66,7 @@ get_split_sse<-function(X,Y,P,c,node)
 fnd_node <- function(P, X, Y, c)
 {
   node = NaN
-  min_sse = get_sse(P, c, Y)
+  min_sse = get_sse(P, Y, c)
   for (i in 1:length(X)) {
     index = i # which variable
     # sort X
