@@ -89,85 +89,73 @@ fnd_node <- function(P, X, Y, c)
 ## Build Trees
 ```{r}
 # input:
-# X - a list of vectors including all the marketing mixes
+# X - a dataframe of all the marketing mixes
 # Y - a vector including weekly sales quantities for the specific category in the particular store
+# P - a vector including weekly prices for the specific category in the particular store
 # n - minimum number of observations in each node
 # c - a variable representing the price for the specific category
 # output:
 # a list recording the split locations on each layer
 
-# find the minimum observations among all nodes
-fnd_min_obs <- function(lstX){
+crt_dtree<-function(X,Y,P,n,c){
+  library(data.tree)
+  pos = c(1:length(Y))
+  tree <- Node$new("All", 
+                   pred_y = mean(Y), 
+                   num_nodes = length(Y),
+                   pos = pos)
+  
+  # find the minimum observations among all nodes
+  fnd_min_obs <- function(tree){
     obs <- c()
-    for (i in 1:length(lstX)){
-      obs[i] <- length(unlist(lstX[[i]][1]))
+    for (i in 1:length(tree$leaves)){
+      obs[i] = tree$leaves[[i]]$num_nodes
     }
     min_obs <- min(obs)
     return (min_obs)
-}
-
-crt_dtree<-function(lstX,lstY,n,c){
-    
-  while (fnd_min_obs(lstX)>5) {
+  }
   
-    # calcaulte current total sse
-    cur_sse <- 0
-    for (i in 1:lengt(lstY)) {
-      tem_X <- lstX[[i]]
-      tem_Y <- lstY[[i]]
-      tem_P <- tem_X[gsub("Y","P",names(tem_Y))]
-      cur_sse <- cur_sse + get_sse(tem_P,tem_Y,c)
-    }
-  
-    # create variables to store splited data and new sse
-    new_lstX <- list()
-    new_lstY <- list()
-    new_sse <- 0
-  
-    # split each data in lstX
-    for (i in 1:length(lstX)){
-    X_toSplit <- lstX[[i]]
-    Y_toSplit <- lstY[[i]]
-    P_toSplit <- X_toSplit[gsub("Y","P",names(Y_toSplit))]
-    
-    # calculate current sse for X_toSplit
-    X_toSplit_sse <- get_sse(P_toSplit,Y_toSplit,c)
-    
-    # find node for X_toSplit
-    split <- fnd_node(X_toSplit,Y,c)
-    split_x <- split[1]
-    split_value <- split[2]
-    split_sse <- split[3]
-    
-    # compare sse before and after split
-    if (split_sse < X_toSplit_sse) {
-      pos <- which(X_toSplit[split_x]<=split_value)
-      X1 <- X_toSplit[pos];  X2 <- X_toSplit[-pos]
-      Y1 <- Y[pos];  Y1 <- Y[-pos]
-      new_lstX <- append(new_lstX,X1)
-      new_lstX <- append(new_lstX,X2)
-      new_lstY <- append(new_lstY,Y1)
-      new_lstY <- append(new_lstY,Y2)
-      new_sse <- new_sse + split_sse
-     } else{
-      new_lstX <- append(new_lstX,X_toSplit)
-      new_lstY <- append(new_lstY,Y_toSplit)
-      new_sse <- new_sse + X_toSplit_sse
-     }
-    }
-    
-    # estimate whether to continue spliting
-    if (new_sse<cur_sse) {
-      lstX <- new_lstX
-      lstY <- new_lstY
-      cur_sse <- new_sse
-    } else{
-      break
+  # grow the tree
+  # lstPos = list(1:length(Y))
+  highestLevel = 1
+  while(fnd_min_obs(tree) > n) {
+    for (i in 1:length(tree$leaves)) {
+      if (tree$leaves[[i]]$num_nodes > n && tree$leaves[[i]]$level == highestLevel) {
+        # select dataframe
+        X = X[tree$leaves[[i]]$pos,]
+        Y = Y[tree$leaves[[i]]$pos]
+        P = P[tree$leaves[[i]]$pos]
+        # split
+        node = fnd_node(P, X, Y, c)
+        if (is.na(node)[1] == FALSE) {
+          # record position
+          leftPos = which(X[, node[1]] <= node[2])
+          rightPos = which(X[, node[1]] > node[2])
+          #lstPos[[i]] = list(pos)
+          #lstPos[[i]][[2]] = which(X[, node[1]] > node[2])
+          leftName = paste(colnames(X)[node[1]], "<=", node[2])
+          rightName = paste(colnames(X)[node[1]], ">", node[2])
+          tree$leaves[[i]]$AddChild(leftName,
+                                    pred_y = mean(Y[leftPos]),
+                                    num_nodes = length(Y[leftPos]),
+                                    pos = leftPos)
+          tree$leaves[[i]]$parent$AddChild(rightName,
+                                           pred_y = mean(Y[rightPos]),
+                                           num_nodes = length(Y[rightPos]),
+                                           pos = rightPos)
+          # recalculate # of levels
+          highestLevel = highestLevel + 1
+        }
+        
+      }
     }
   }
+  
+  #tree$leaves[[1]]$pos
+  print(tree, "pred_y", "num_nodes", "level")
+  return(tree)
+  
 }
-
-
 ```
 
 
