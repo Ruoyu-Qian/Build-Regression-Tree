@@ -31,7 +31,7 @@ get_sse <- function(P, Y, c)
 # Y - a vector including weekly sales quantities for the specific category in the particular store
 # P - a vector including weekly prices for the specific category in the particular store
 # c - a variable representing the price for the specific category
-# node - index of the position where the data is splited
+# position - index of the position where the data is splited
 
 # output:
 # a new SSE for splited data
@@ -57,7 +57,7 @@ get_split_sse<-function(X,Y,P,c,position)
 ```{r}
 # input:
 # P - a vector including weekly prices for the specific category in the particular store
-# X - a list of vectors including all of the marketing mix
+# X - a dataframe of all of the marketing mix
 # Y - a vector including weekly sales quantities for the specific category in the particular store
 # c - a variable representing the price for the specific category
 # output:
@@ -69,13 +69,17 @@ fnd_node <- function(P, X, Y, c)
   min_sse = get_sse(P, Y, c)
   for (i in 1:length(X)) {
     index = i # which variable
-    # sort X
-    X_vector = sort(X[[i]])
-    for (j in 1:length(X_vector)){
-      sse = get_split_sse(X_vector, Y, P, c, j)
+    # sort data
+    order = order(X[,index])
+    sorted_x = X[order,index]
+    sorted_Y = Y[order]
+    sorted_P = P[order]
+    
+    for (j in 1:length(sorted_x)){
+      sse = get_split_sse(sorted_x, sorted_Y, sorted_P, c, j)
       if (sse < min_sse){
         min_sse = sse
-        value = (X_vector[j]+X_vector[j+1])/2 # where to split
+        value = (sorted_x[j]+sorted_x[j+1])/2 # where to split
         node = c(index, value, min_sse)
       }
     }
@@ -105,20 +109,20 @@ crt_dtree<-function(X,Y,P,n,c){
                    num_nodes = length(Y),
                    pos = pos)
   
-  # find the minimum observations among all nodes
-  fnd_min_obs <- function(tree){
+  # find the maximum observations among all nodes
+  fnd_max_obs <- function(tree){
     obs <- c()
     for (i in 1:length(tree$leaves)){
       obs[i] = tree$leaves[[i]]$num_nodes
     }
-    min_obs <- min(obs)
-    return (min_obs)
+    max_obs <- max(obs)
+    return (max_obs)
   }
   
   # grow the tree
   # lstPos = list(1:length(Y))
   highestLevel = 1
-  while(fnd_min_obs(tree) > n) {
+  while(fnd_max_obs(tree) > n) {
     for (i in 1:length(tree$leaves)) {
       if (tree$leaves[[i]]$num_nodes > n && tree$leaves[[i]]$level == highestLevel) {
         # select dataframe
@@ -156,6 +160,83 @@ crt_dtree<-function(X,Y,P,n,c){
   return(tree)
   
 }
+
+```
+
+
+```{r}
+# find the maximum observations among all nodes
+# fnd_max_obs <- function(X){
+#     obs <- c()
+#     for (i in 1:length(X)){
+#       obs[i] <- length(unlist(lstX[[i]][1]))
+#     }
+#     max_obs <- max(obs)
+#     return (max_obs)
+# }
+# 
+# crt_dtree<-function(lstX,lstY,n,c){
+#     
+#   while (fnd_max_obs(lstX)>5) {
+#   
+#     # calcaulte current total sse
+#     cur_sse <- 0
+#     for (i in 1:lengt(lstY)) {
+#       tem_X <- lstX[[i]]
+#       tem_Y <- lstY[[i]]
+#       tem_P <- tem_X[gsub("Y","P",names(tem_Y))]
+#       cur_sse <- cur_sse + get_sse(tem_P,tem_Y,c)
+#     }
+#   
+#     # create variables to store splited data and new sse
+#     new_lstX <- list()
+#     new_lstY <- list()
+#     new_sse <- 0
+#   
+#     # split each data in lstX
+#     for (i in 1:length(lstX)){
+#     X_toSplit <- lstX[[i]]
+#     Y_toSplit <- lstY[[i]]
+#     P_toSplit <- X_toSplit[gsub("Y","P",names(Y_toSplit))]
+#     
+#     # calculate current sse for X_toSplit
+#     X_toSplit_sse <- get_sse(P_toSplit,Y_toSplit,c)
+#     
+#     # find node for X_toSplit
+#     split <- fnd_node(X_toSplit,Y,c)
+#     split_x <- split[1]
+#     split_value <- split[2]
+#     split_sse <- split[3]
+#     
+#     # compare sse before and after split
+#     if (split_sse < X_toSplit_sse) {
+#       pos <- which(X_toSplit[split_x]<=split_value)
+#       X1 <- X_toSplit[pos];  X2 <- X_toSplit[-pos]
+#       Y1 <- Y[pos];  Y1 <- Y[-pos]
+#       new_lstX <- append(new_lstX,X1)
+#       new_lstX <- append(new_lstX,X2)
+#       new_lstY <- append(new_lstY,Y1)
+#       new_lstY <- append(new_lstY,Y2)
+#       new_sse <- new_sse + split_sse
+#      } else{
+#       new_lstX <- append(new_lstX,X_toSplit)
+#       new_lstY <- append(new_lstY,Y_toSplit)
+#       new_sse <- new_sse + X_toSplit_sse
+#      }
+#     }
+#     
+#     # estimate whether to continue spliting
+#     if (new_sse<cur_sse) {
+#       lstX <- new_lstX
+#       lstY <- new_lstY
+#       cur_sse <- new_sse
+#     } else{
+#       break
+#     }
+#   }
+# }
+
+
 ```
 
 
